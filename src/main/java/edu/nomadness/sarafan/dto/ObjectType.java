@@ -1,5 +1,5 @@
 package edu.nomadness.sarafan.dto;
 
 public enum ObjectType {
-  MESSAGE
+  MESSAGE, COMMENT
 }
