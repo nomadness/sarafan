@@ -2,6 +2,7 @@ package edu.nomadness.sarafan.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import edu.nomadness.sarafan.domain.Message;
+import edu.nomadness.sarafan.domain.User;
 import edu.nomadness.sarafan.domain.Views;
 import edu.nomadness.sarafan.dto.EventType;
 import edu.nomadness.sarafan.dto.MetaDto;
@@ -14,6 +15,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -55,9 +57,10 @@ public class MessageController {
   }
 
   @PostMapping
-  public Message create(@RequestBody Message message) throws IOException {
+  public Message create(@RequestBody Message message, @AuthenticationPrincipal User user) throws IOException {
     message.setCreationDate(LocalDateTime.now());
     fillMeta(message);
+    message.setAuthor(user);
     Message updatedMessage = messageRepository.save(message);
 
     wsSender.accept(EventType.CREATE, updatedMessage);

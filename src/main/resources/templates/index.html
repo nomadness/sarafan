@@ -9,6 +9,7 @@
     <!-- версия для разработки, отображает полезные предупреждения в консоли -->
     <script th:inline="javascript">
         let frontendData = [[${frontendData}]];
+        let messages = [# th:utext="${messages}" /];
     </script>
 </head>
 <body>

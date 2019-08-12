@@ -1,6 +1,10 @@
 package edu.nomadness.sarafan.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import edu.nomadness.sarafan.domain.User;
+import edu.nomadness.sarafan.domain.Views;
 import edu.nomadness.sarafan.repository.MessageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,10 +20,14 @@ import java.util.HashMap;
 @RequestMapping("/")
 public class MainController {
   private final MessageRepository messageRepository;
+  private final ObjectWriter writer;
 
   @Autowired
-  public MainController(MessageRepository messageRepository) {
+  public MainController(MessageRepository messageRepository, ObjectMapper mapper) {
     this.messageRepository = messageRepository;
+    this.writer = mapper
+            .setConfig(mapper.getSerializationConfig())
+            .writerWithView(Views.FullMessage.class);
   }
 
   @Value("${spring.profiles.active}")
@@ -28,12 +36,14 @@ public class MainController {
   @GetMapping
   public String main(
           Model model,
-          @AuthenticationPrincipal User user) {
+          @AuthenticationPrincipal User user) throws JsonProcessingException {
     HashMap<Object, Object> data = new HashMap<>();
 
     if(user != null) {
       data.put("profile", user);
-      data.put("messages", messageRepository.findAll());
+
+      String messages = writer.writeValueAsString(messageRepository.findAll());
+      model.addAttribute("messages", messages);
     }
 
     model.addAttribute("frontendData", data);

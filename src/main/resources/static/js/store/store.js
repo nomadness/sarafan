@@ -1,12 +1,13 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import messagesApi from 'api/messages';
+import commentApi from 'api/comment';
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
     state: {
-        messages: frontendData.messages,
+        messages,
         profile: frontendData.profile
     },
     getters: {
@@ -29,7 +30,7 @@ export default new Vuex.Store({
             ]
         },
         removeMessageMutation(state, message) {
-            const deletionIndex = state.messages.findIndex(item => item.id === message.id);
+            const deletionIndex = state.messages.findIndex(item => item.id === message.id)
 
             if (deletionIndex > -1) {
                 state.messages = [
@@ -37,6 +38,22 @@ export default new Vuex.Store({
                     ...state.messages.slice(deletionIndex + 1)
                 ]
             }
+        },
+        addCommentMutation(state, comment) {
+            const updateIndex = state.messages.findIndex(item => item.id === comment.message.id);
+            const message = state.messages[updateIndex];
+
+            state.messages = [
+                ...state.messages.slice(0, updateIndex),
+                {
+                    ...message,
+                    comments: [
+                        ...message.comments,
+                        comment
+                    ]
+                },
+                ...state.messages.slice(updateIndex + 1)
+            ]
         },
     },
     actions: {
@@ -46,9 +63,9 @@ export default new Vuex.Store({
             const index = state.messages.findIndex(item => item.id === data.id);
 
             if (index > -1) {
-                commit('updateMessageMutation', data);
+                commit('updateMessageMutation', data)
             } else {
-                commit('addMessageMutation', data);
+                commit('addMessageMutation', data)
             }
         },
         async updateMessageAction({commit}, message) {
@@ -60,8 +77,13 @@ export default new Vuex.Store({
             const result = await messagesApi.remove(message.id);
 
             if (result.ok) {
-                commit('removeMessageMutation', message);
+                commit('removeMessageMutation', message)
             }
         },
+        async addCommentAction({commit, state}, comment) {
+            const response = await commentApi.add(comment);
+            const data = await response.json();
+            commit('addCommentMutation', comment)
+        }
     }
 });
