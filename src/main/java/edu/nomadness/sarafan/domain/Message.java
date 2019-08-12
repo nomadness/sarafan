@@ -18,11 +18,10 @@ import java.util.List;
 @EqualsAndHashCode(of = {"id"})
 @Data
 @JsonIdentityInfo(
-        generator = ObjectIdGenerators.PropertyGenerator.class,
-        property = "id"
+        property = "id",
+        generator = ObjectIdGenerators.PropertyGenerator.class
 )
 public class Message {
-
   @Id
   @GeneratedValue(strategy = GenerationType.AUTO)
   @JsonView(Views.Id.class)

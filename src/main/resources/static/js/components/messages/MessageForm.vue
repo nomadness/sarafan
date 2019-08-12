@@ -6,15 +6,14 @@
                 v-model="text"
                 @keyup.enter="save"
         />
-        <v-btn class="mr-0" @click="save">
+        <v-btn @click="save">
             Save
         </v-btn>
     </v-layout>
 </template>
 
 <script>
-    import { mapActions } from 'vuex';
-
+    import { mapActions } from 'vuex'
     export default {
         props: ['messageAttr'],
         data() {
@@ -35,14 +34,14 @@
                 const message = {
                     id: this.id,
                     text: this.text
-                };
-                if (this.id) {
-                    this.updateMessageAction(message);
-                } else {
-                    this.addMessageAction(message);
                 }
-                this.text = '';
-                this.id = '';
+                if (this.id) {
+                    this.updateMessageAction(message)
+                } else {
+                    this.addMessageAction(message)
+                }
+                this.text = ''
+                this.id = ''
             }
         }
     }
